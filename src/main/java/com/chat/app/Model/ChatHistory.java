@@ -1,22 +1,21 @@
 package com.chat.app.Model;
 
-import com.mongodb.internal.connection.Time;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import jakarta.persistence.Id;
+
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "message")
+@Document(collection = "chat_history")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Message {
-
+public class ChatHistory {
     @Id
     private String id;
     private String channelId;
-    private String userId;
-    private String content;
-    private Time timestamp;
+    private List<Message> messages;
 }
