@@ -11,6 +11,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 @NoArgsConstructor
@@ -38,5 +40,20 @@ public class MessageHistoryService {
         // Execute update operation
         mongoTemplate.updateFirst(query, update, ChatConstants.CHAT_HISTORY);
 
+    }
+
+    public List<Message> getMessageHistory(String channelId) {
+        // Define query to retrieve messages for the given channel_id
+        Query query = new Query(Criteria.where("channel_id").is(channelId));
+
+        // Execute query to fetch messages
+        List<Message> messages = mongoTemplate.find(query, Message.class, "Chat_History");
+
+        // Check if messages exist for the given channel_id
+        if (messages.isEmpty()) {
+            throw new IllegalArgumentException("No messages for the given channel_id");
+        } else {
+            return messages;
+        }
     }
 }

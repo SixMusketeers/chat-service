@@ -11,10 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -74,6 +73,21 @@ public class MainController {
         }
         return "Message Sent successfully";
     }
+
+    @GetMapping("/show-messages")
+    public List<Message> showMessages(@RequestParam String channelId) {
+        try{
+            return messageHistoryService.getMessageHistory(channelId);
+        } catch (IllegalArgumentException ex) {
+            logger.error("Error showing messages" + ex.getMessage());
+            return null;
+        } catch (Exception ex) {
+            logger.error("Internal server error");
+            return null;
+        }
+    }
+
+
 
     @PostMapping("/addUserToSQL")
     public void addMessageToSQL(@RequestBody User user){
