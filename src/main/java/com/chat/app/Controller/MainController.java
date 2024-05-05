@@ -4,6 +4,7 @@ import com.chat.app.Model.Message;
 import com.chat.app.Model.User;
 import com.chat.app.Repository.UserRepo;
 import com.chat.app.config.ChatConstants;
+//import com.chat.app.services.KafkaService;
 import com.chat.app.services.MessageHistoryService;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -27,25 +28,13 @@ public class MainController {
     @Autowired
     MongoTemplate mongoTemplate;
 
+//    @Autowired
+//    KafkaService kafkaService;
+
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
     private UserRepo userRepo;
 
-    @PostMapping("/addMessage")
-    public void addMessage(@RequestBody Message message){
-        System.out.println("Before saving");
-        // Chat message test
-//        mongoTemplate.insert(message, ANALYTICS_COLLECTION);
-
-        // Chat History test
-//        ChatHistory chatHistory = new ChatHistory();
-//        chatHistory.setChannelId(message.getChannelId());
-//        chatHistory.setMessages(List.of(message));
-//
-//        mongoTemplate.insert(chatHistory, "chat_history");
-
-        System.out.println("After Saving");
-    }
 
     @PostMapping("/sendMessage")
     public String sendMessage(@RequestBody Message message) {
@@ -60,8 +49,10 @@ public class MainController {
             message = mongoTemplate.insert(message, ChatConstants.MESSAGE);
             logger.info("*** Message Sent successfully *** " + message.getId());
 
+            // Send message to kafka
+//            kafkaService.addMessageToQueue(message);
 
-            // Store message in chat history document
+//            Store message in chat history document
             messageHistoryService.persistMessageHistory(message);
             logger.info("*** Message Received successfully ***" + message.getId());
 

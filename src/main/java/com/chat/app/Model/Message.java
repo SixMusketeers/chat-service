@@ -1,6 +1,5 @@
 package com.chat.app.Model;
 
-import com.mongodb.internal.connection.Time;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,5 +17,4 @@ public class Message {
     private String channelId;
     private String userId;
     private String content;
-    private Time timestamp;
 }

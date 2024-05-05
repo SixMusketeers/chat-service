@@ -18,4 +18,9 @@ public class ChatHistory {
     private String id;
     private String channelId;
     private List<Message> messages;
+
+    public ChatHistory(String channelId, List<Message> messages) {
+        this.channelId = channelId;
+        this.messages = messages;
+    }
 }
