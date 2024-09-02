@@ -1,5 +1,6 @@
 package com.chat.app.services;
 
+import com.chat.app.Model.ChatHistory;
 import com.chat.app.Model.Message;
 import com.chat.app.config.ChatConstants;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 
 @Service
@@ -30,30 +32,33 @@ public class MessageHistoryService {
 
         // Check if the document with the specified channelId exists
         if (!mongoTemplate.exists(query, ChatConstants.CHAT_HISTORY)) {
-            // Handle the case where the channelId doesn't exist
-            throw new IllegalArgumentException("ChannelId '" + channelId + "' does not exist in Chat_History");
+            // create a new channel
+             mongoTemplate.insert(new ChatHistory(channelId, List.of(message)), ChatConstants.CHAT_HISTORY);
+        } else {
+            // Define update operation to append message to the messages array
+            Update update = new Update().push("messages", message);
+
+            // Execute update operation
+            mongoTemplate.updateFirst(query, update, ChatConstants.CHAT_HISTORY);
         }
 
-        // Define update operation to append message to the messages array
-        Update update = new Update().push("messages", message);
 
-        // Execute update operation
-        mongoTemplate.updateFirst(query, update, ChatConstants.CHAT_HISTORY);
 
     }
 
     public List<Message> getMessageHistory(String channelId) {
-        // Define query to retrieve messages for the given channel_id
-        Query query = new Query(Criteria.where("channel_id").is(channelId));
+        Query query = new Query(Criteria.where(ChatConstants.CHANNEL_ID).is(channelId));
 
         // Execute query to fetch messages
-        List<Message> messages = mongoTemplate.find(query, Message.class, "Chat_History");
+        ChatHistory chatHistory = mongoTemplate.findOne(query, ChatHistory.class, ChatConstants.CHAT_HISTORY);
 
-        // Check if messages exist for the given channel_id
-        if (messages.isEmpty()) {
+//         Check if messages exist for the given channel_id
+        if (Objects.isNull(chatHistory)) {
+            throw new IllegalArgumentException("Chat Histroy Error");
+        } else if (chatHistory.getMessages() == null || chatHistory.getMessages().isEmpty()) {
             throw new IllegalArgumentException("No messages for the given channel_id");
         } else {
-            return messages;
+            return chatHistory.getMessages();
         }
     }
 }
